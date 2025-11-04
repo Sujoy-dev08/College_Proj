@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tracknheal Service - Login</title>
+
+    <style>
+        body { font-family: Arial; background: #f0f0f0; margin: 0; }
+        .container { width: 350px; margin: 90px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px #aaa; }
+        h2 { text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid gray; border-radius: 5px; }
+        button { width: 100%; padding: 10px; background: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .toggle { color: blue; text-decoration: underline; cursor: pointer; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="loginBox">
+    <h2>Login</h2>
+    <form onsubmit="handleLogin(event)">
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" required>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" required>
+        </div>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="toggle" onclick="showSignup()">Create a new account</div>
+</div>
+
+<div class="container" id="signupBox" style="display:none;">
+    <h2>Signup</h2>
+    <form onsubmit="handleSignup(event)">
+        <div class="input-group">
+            <label>Name</label>
+            <input type="text" id="signupName" required>
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="signupEmail" required>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="signupPassword" required>
+        </div>
+
+        <button type="submit">Signup</button>
+    </form>
+
+    <div class="toggle" onclick="showLogin()">Already have an account? Login</div>
+</div>
+
+<script>
+function showSignup() {
+    document.getElementById("signupBox").style.display = "block";
+    document.getElementById("loginBox").style.display = "none";
+}
+
+function showLogin() {
+    document.getElementById("signupBox").style.display = "none";
+    document.getElementById("loginBox").style.display = "block";
+}
+
+// ✅ Signup API call
+function handleSignup(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("signupName").value;
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+
+    fetch("http://localhost:3000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message));
+}
+
+// ✅ Login API call
+function handleLogin(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message));
+}
+</script>
+
+</body>
+</html>
