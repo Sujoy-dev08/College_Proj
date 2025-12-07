@@ -25,7 +25,6 @@ Node.js for backend processing.
     ├── package.json
     ├── package-lock.json
     ├── server.js
-    └── .gitattributes
 
 ## 📝 Getting Started -- Installation & Setup
 
