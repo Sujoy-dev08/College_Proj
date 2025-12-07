@@ -6,106 +6,282 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <style>
-/* ---- SAME STYLES FROM new_index.html (UI LOOKS SAME AS YOUR IMAGE) ---- */
+
+:root {
+    --primary-color: #e74c3c;
+    --secondary-color: #f8f9fa;
+    --text-color: #333;
+    --border-color: #e0e0e0;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
 
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #fafafa;
-    color: #222;
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: var(--text-color);
+    line-height: 1.6;
 }
 
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 36px;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    padding: 20px 40px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: all 0.3s ease;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    font-weight: 600;
-    font-size: 1.3em;
-    letter-spacing: 1px;
+    font-weight: 700;
+    font-size: 1.5em;
+    letter-spacing: 0.5px;
+    color: var(--primary-color);
 }
 
-.logo-icon { margin-right: 8px; font-size: 1.4em; }
+.logo-icon {
+    margin-right: 10px;
+    font-size: 1.6em;
+}
 
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 28px;
+    gap: 30px;
+    margin: 0;
 }
 
-.nav-links a { text-decoration: none; color: #222; font-weight: 500; }
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+}
 
 .login-btn {
-    border: 1px solid #222;
-    background: none;
-    padding: 6px 18px;
-    border-radius: 8px;
+    border: 2px solid var(--primary-color);
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 25px;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
-/* --- Modal Style (same as new_index) --- */
+.login-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
 
+/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.45);
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
 }
 
 .modal-content {
-    width: 380px;
+    width: 90%;
+    max-width: 400px;
     background: white;
-    margin: 6% auto;
-    padding: 20px;
-    border-radius: 10px;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .close {
     float: right;
-    font-size: 26px;
+    font-size: 28px;
     cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: var(--primary-color);
 }
 
 .tab-button {
     width: 50%;
-    padding: 10px;
+    padding: 12px;
     cursor: pointer;
     border: none;
-    background: #eee;
+    background: var(--secondary-color);
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .tab-button.active {
-    background: #e74c3c;
+    background: var(--primary-color);
     color: white;
 }
 
-.form-content { display: none; }
-.form-content.active { display: block; }
+.form-content {
+    display: none;
+}
 
-.input-group { margin-bottom: 15px; text-align: left; }
-input { width: 100%; padding: 10px; border: 1px solid gray; border-radius: 6px; }
+.form-content.active {
+    display: block;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
 
 .submit-btn {
     width: 100%;
-    background: #e74c3c;
+    background: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px;
+    padding: 14px;
     margin-top: 10px;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #c0392b;
+}
+
+/* Main Section */
+section {
+    text-align: center;
+    margin-top: 60px;
+    padding: 40px 20px;
+}
+
+section button {
+    background: var(--primary-color);
+    color: white;
+    padding: 20px 50px;
+    font-size: 24px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+}
+
+section button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+}
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.search-bar input {
+    padding: 12px;
+    width: 250px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     font-size: 16px;
 }
 
-</style>
+.search-bar .submit-btn {
+    width: auto;
+    padding: 12px 20px;
+}
+
+section h3 {
+    font-weight: 600;
+    margin-top: 40px;
+}
+
+section h2 {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav-links {
+        gap: 20px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    section button {
+        padding: 15px 30px;
+        font-size: 20px;
+    }
+    
+    .search-bar {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .search-bar input {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+    </style>
 </head>
 
 <body>
@@ -125,17 +301,15 @@ input { width: 100%; padding: 10px; border: 1px solid gray; border-radius: 6px; 
 </nav>
 
 <!---------------- MAIN UI ---------------->
-<section style="text-align:center; margin-top:40px;">
-    <button style="background:#e74c3c; color:white; padding:18px 40px; font-size:22px; border:none; border-radius:10px;">
-        Book Ambulance Now 🚑
-    </button>
+<section>
+    <button>Book Ambulance Now 🚑</button>
 
-    <div class="search-bar" style="margin-top:20px;">
-        <input type="text" placeholder="Pickup Location" style="padding:12px; width:240px;">
-        <button class="submit-btn" style="width:auto;">Search</button>
+    <div class="search-bar">
+        <input type="text" placeholder="Pickup Location">
+        <button class="submit-btn">Search</button>
     </div>
 
-    <div style="margin-top:30px;">
+    <div>
         <h3>📍 24/7 Emergency Support</h3>
         <h2>123 - 456 - 7890</h2>
     </div>
