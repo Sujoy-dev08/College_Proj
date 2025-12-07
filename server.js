@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "BABU@08ram",
+    password: "Narayan@2004",
     database: "tracknheal_db"
 });
 
