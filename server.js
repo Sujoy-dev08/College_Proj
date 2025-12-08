@@ -2,10 +2,18 @@ import express from "express";
 import mysql from "mysql2";
 import cors from "cors";
 import bodyParser from "body-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// ✅ Serve static files from public folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // ✅ MySQL Connection
 const db = mysql.createConnection({
@@ -50,6 +58,37 @@ app.post("/login", (req, res) => {
         } else {
             res.json({ message: "Invalid email or password" });
         }
+    });
+});
+
+// ✅ BOOK AMBULANCE API
+app.post("/book", (req, res) => {
+    const { patientName, phone, pickupLocation, dropLocation, emergencyType, notes } = req.body;
+
+    // Validate required fields
+    if (!patientName || !phone || !pickupLocation || !dropLocation || !emergencyType) {
+        return res.json({
+            success: false,
+            message: "All required fields must be filled"
+        });
+    }
+
+    const sql = `INSERT INTO bookings (patient_name, phone, pickup_location, drop_location, emergency_type, notes) 
+                 VALUES (?, ?, ?, ?, ?, ?)`;
+
+    db.query(sql, [patientName, phone, pickupLocation, dropLocation, emergencyType, notes || ""], (err, result) => {
+        if (err) {
+            console.error("Booking error:", err);
+            return res.json({
+                success: false,
+                message: "Booking failed. Please try again."
+            });
+        }
+        res.json({
+            success: true,
+            message: "Booking confirmed!",
+            bookingId: result.insertId
+        });
     });
 });
 
