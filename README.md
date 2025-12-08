@@ -92,13 +92,6 @@ const SALT_ROUNDS = 10; // Cost factor for hashing
 ---
 
 ### Step 3: Updated Signup API
-**Before (Insecure):**
-```javascript
-// Password stored as plain text
-db.query(sql, [name, email, password], ...)
-```
-
-**After (Secure):**
 ```javascript
 // Hash password before storing
 const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -109,12 +102,6 @@ db.query(sql, [name, email, hashedPassword], ...)
 
 ### Step 4: Updated Login API
 **Before (Insecure):**
-```javascript
-// Compared plain text in SQL query
-const sql = "SELECT * FROM users WHERE email=? AND password=?";
-```
-
-**After (Secure):**
 ```javascript
 // Fetch user by email only
 const sql = "SELECT * FROM users WHERE email=?";
