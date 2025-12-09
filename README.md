@@ -171,17 +171,6 @@ Stored in DB: "$2b$10$N9qo8uLOickgx2ZMRZoMye.IjqQBrkHx5..."
            60-character hash (irreversible)
 ```
 
----
-
-## Files Changed
-
-| File | Changes |
-|------|---------|
-| [package.json](cci:7://file:///c:/Users/rohan/OneDrive/Desktop/Collage_Proj/package.json:0:0-0:0) | Added bcrypt dependency |
-| [server.js](cci:7://file:///c:/Users/rohan/OneDrive/Desktop/Collage_Proj/server.js:0:0-0:0) | Updated signup & login with bcrypt |
-
----
-
 ## Testing Steps
 
 1. **Clear old users** (they have plain text passwords):
