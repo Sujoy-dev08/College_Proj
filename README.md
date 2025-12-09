@@ -207,17 +207,6 @@ Stored in DB: "$2b$10$N9qo8uLOickgx2ZMRZoMye.IjqQBrkHx5..."
 
 ---
 
-## Security Benefits
-
-| Aspect | Before | After |
-|--------|--------|-------|
-| Password Storage | Plain text `password123` | Hashed `$2b$10$...` |
-| If DB Leaked | All passwords exposed | Passwords protected |
-| Rainbow Table Attack | Vulnerable | Protected (unique salt) |
-| Brute Force | Easy | Very slow (10 rounds) |
-
----
-
 
 
 ## 🔗 Repository
