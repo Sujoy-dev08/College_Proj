@@ -123,11 +123,6 @@ The database connection is configured in `server.js`:
 
 # 🔐 Password Hashing Implementation with Bcrypt
 
-## Problem Statement
-Previously, user passwords were stored as **plain text** in the database, which is a critical security vulnerability. If the database is compromised, all passwords are exposed.
-
-
-
 ### Step 1: Installed Bcrypt Package
 ```bash
 npm install bcrypt
