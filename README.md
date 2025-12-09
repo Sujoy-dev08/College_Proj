@@ -3,13 +3,6 @@
 A web-based application that provides a structured interface for workflows. The project uses HTML, CSS, JavaScript for the frontend and
 Node.js for backend processing.
 
-## 🚀 Features
-
--   User authentication and interface
--   Dashboard layout for users
--   CRUD operations
--   Responsive design
--   Static asset handling
 
 ## 🛠️ Tech Stack & Tools
 
