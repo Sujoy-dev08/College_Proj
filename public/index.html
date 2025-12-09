@@ -266,12 +266,38 @@
         @media (max-width: 768px) {
             .navbar {
                 padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .hamburger {
+                display: flex;
             }
 
             .nav-links {
-                gap: 20px;
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                padding: 20px 0;
+                gap: 15px;
+                order: 3;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                padding: 10px 0;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+
+            .login-btn {
+                order: 2;
             }
 
             .modal-content {
@@ -293,6 +319,36 @@
                 width: 100%;
                 max-width: 300px;
             }
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+            gap: 5px;
+            z-index: 101;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-color);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -7px);
         }
 
         /* Booking Modal Styles */
@@ -421,11 +477,18 @@
     <nav class="navbar">
         <div class="logo"><span class="logo-icon">🚑</span>Ambulance</div>
 
+        <div class="hamburger" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
         <ul class="nav-links">
-            <li><a href="#home">🏠 Home</a></li>
-            <li><a href="#booking" onclick="openBookingModal(); return false;">🚑 Book Ambulance</a></li>
-            <li><a href="#services">📋 Services</a></li>
-            <li><a href="#contact">📞 Contact</a></li>
+            <li><a href="#home" onclick="closeMobileMenu()">🏠 Home</a></li>
+            <li><a href="#booking" onclick="openBookingModal(); closeMobileMenu(); return false;">🚑 Book Ambulance</a>
+            </li>
+            <li><a href="#services" onclick="closeMobileMenu()">📋 Services</a></li>
+            <li><a href="#contact" onclick="closeMobileMenu()">📞 Contact</a></li>
         </ul>
 
         <button class="login-btn" onclick="openModal()">Login</button>
@@ -608,6 +671,18 @@
 
     <!---------------- JS FUNCTIONS ---------------->
     <script>
+        // ✅ Toggle mobile menu
+        function toggleMobileMenu() {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.querySelector('.nav-links').classList.toggle('active');
+        }
+
+        // ✅ Close mobile menu
+        function closeMobileMenu() {
+            document.querySelector('.hamburger').classList.remove('active');
+            document.querySelector('.nav-links').classList.remove('active');
+        }
+
         // ✅ Open modal
         function openModal() {
             document.getElementById("loginModal").style.display = "block";
