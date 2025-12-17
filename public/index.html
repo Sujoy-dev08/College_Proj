@@ -1,249 +1,959 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>tracknheal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <style>
-/* ---- SAME STYLES FROM new_index.html (UI LOOKS SAME AS YOUR IMAGE) ---- */
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #fafafa;
-    color: #222;
-}
+        html {
+            scroll-behavior: smooth;
+        }
 
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 36px;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-}
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
 
-.logo {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    font-size: 1.3em;
-    letter-spacing: 1px;
-}
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
 
-.logo-icon { margin-right: 8px; font-size: 1.4em; }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5em;
+            letter-spacing: 0.5px;
+            color: var(--primary-color);
+        }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 28px;
-}
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 1.6em;
+        }
 
-.nav-links a { text-decoration: none; color: #222; font-weight: 500; }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin: 0;
+        }
 
-.login-btn {
-    border: 1px solid #222;
-    background: none;
-    padding: 6px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-}
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
 
-/* --- Modal Style (same as new_index) --- */
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
 
-.modal {
-    display: none;
-    position: fixed;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.45);
-}
+        .login-btn {
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
 
-.modal-content {
-    width: 380px;
-    background: white;
-    margin: 6% auto;
-    padding: 20px;
-    border-radius: 10px;
-}
+        .login-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
 
-.close {
-    float: right;
-    font-size: 26px;
-    cursor: pointer;
-}
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-.tab-button {
-    width: 50%;
-    padding: 10px;
-    cursor: pointer;
-    border: none;
-    background: #eee;
-}
+        .user-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
 
-.tab-button.active {
-    background: #e74c3c;
-    color: white;
-}
+        .logout-btn {
+            border: 2px solid #c0392b;
+            background: transparent;
+            color: #c0392b;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
 
-.form-content { display: none; }
-.form-content.active { display: block; }
+        .logout-btn:hover {
+            background: #c0392b;
+            color: white;
+        }
 
-.input-group { margin-bottom: 15px; text-align: left; }
-input { width: 100%; padding: 10px; border: 1px solid gray; border-radius: 6px; }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
 
-.submit-btn {
-    width: 100%;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 6px;
-    font-size: 16px;
-}
+        .modal-content {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.3s ease;
+        }
 
-</style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-button {
+            width: 50%;
+            padding: 12px;
+            cursor: pointer;
+            border: none;
+            background: var(--secondary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            margin-top: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Main Section */
+        section {
+            text-align: center;
+            margin-top: 60px;
+            padding: 40px 20px;
+        }
+
+        section button {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px 50px;
+            font-size: 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .search-bar input {
+            padding: 12px;
+            width: 250px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-bar .submit-btn {
+            width: auto;
+            padding: 12px 20px;
+        }
+
+        section h3 {
+            font-weight: 600;
+            margin-top: 40px;
+        }
+
+        section h2 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                padding: 20px 0;
+                gap: 15px;
+                order: 3;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                padding: 10px 0;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+
+            .login-btn {
+                order: 2;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            section button {
+                padding: 15px 30px;
+                font-size: 20px;
+            }
+
+            .search-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .search-bar input {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+            gap: 5px;
+            z-index: 101;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-color);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -7px);
+        }
+
+        /* Booking Modal Styles */
+        .booking-modal .modal-content {
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 5% auto;
+        }
+
+        .booking-modal .submit-btn {
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .booking-modal h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .booking-modal .input-group {
+            margin-bottom: 18px;
+        }
+
+        .booking-modal select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .booking-modal select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .booking-modal textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .booking-modal textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .booking-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .booking-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .booking-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .submit-btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .submit-btn.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .booking-id {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+    </style>
 </head>
 
 <body>
 
-<!---------------- NAVBAR ---------------->
-<nav class="navbar">
-    <div class="logo"><span class="logo-icon">🚑</span>Ambulance</div>
+    <!---------------- NAVBAR ---------------->
+    <nav class="navbar">
+        <div class="logo"><span class="logo-icon">🚑</span>Ambulance</div>
 
-    <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Book Ambulance</a></li>
-        <li><a href="#">Services</a></li>
-        <li><a href="#">Contact</a></li>
-    </ul>
-
-    <button class="login-btn" onclick="openModal()">Login</button>
-</nav>
-
-<!---------------- MAIN UI ---------------->
-<section style="text-align:center; margin-top:40px;">
-    <button style="background:#e74c3c; color:white; padding:18px 40px; font-size:22px; border:none; border-radius:10px;">
-        Book Ambulance Now 🚑
-    </button>
-
-    <div class="search-bar" style="margin-top:20px;">
-        <input type="text" placeholder="Pickup Location" style="padding:12px; width:240px;">
-        <button class="submit-btn" style="width:auto;">Search</button>
-    </div>
-
-    <div style="margin-top:30px;">
-        <h3>📍 24/7 Emergency Support</h3>
-        <h2>123 - 456 - 7890</h2>
-    </div>
-</section>
-
-<!---------------- LOGIN / SIGNUP MODAL ---------------->
-<div id="loginModal" class="modal">
-    <div class="modal-content">
-
-        <span class="close" onclick="closeModal()">&times;</span>
-
-        <!-- Tabs -->
-        <div style="display:flex;">
-            <button class="tab-button active" onclick="switchTab(event,'login')">Login</button>
-            <button class="tab-button" onclick="switchTab(event,'signup')">Sign Up</button>
+        <div class="hamburger" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
 
-        <!-- Login Form -->
-        <div id="login" class="form-content active">
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" id="loginEmail" required>
-            </div>
+        <ul class="nav-links">
+            <li><a href="#home" onclick="closeMobileMenu()">🏠 Home</a></li>
+            <li><a href="#booking" onclick="openBookingModal(); closeMobileMenu(); return false;">🚑 Book Ambulance</a>
+            </li>
+            <li><a href="#services" onclick="closeMobileMenu()">📋 Services</a></li>
+            <li><a href="#contact" onclick="closeMobileMenu()">📞 Contact</a></li>
+        </ul>
 
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" required>
-            </div>
+        <div id="authSection">
+            <button class="login-btn" onclick="openModal()">Login</button>
+        </div>
+    </nav>
 
-            <button class="submit-btn" onclick="handleLogin()">Login</button>
+    <!---------------- MAIN UI ------------------>
+    <section id="home">
+        <button onclick="openBookingModal()">Book Ambulance Now 🚑</button>
+
+        <div class="search-bar">
+            <input type="text" id="quickPickupLocation" placeholder="Pickup Location">
+            <button class="submit-btn" onclick="openBookingWithLocation()">Search</button>
         </div>
 
-        <!-- Signup Form -->
-        <div id="signup" class="form-content">
-            <div class="input-group">
-                <label>Name</label>
-                <input type="text" id="signupName" required>
-            </div>
-
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" id="signupEmail" required>
-            </div>
-
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="signupPassword" required>
-            </div>
-
-            <button class="submit-btn" onclick="handleSignup()">Create Account</button>
+        <div>
+            <h3>📍 24/7 Emergency Support</h3>
+            <h2>123 - 456 - 7890</h2>
         </div>
+    </section>
 
+    <!------------------ SERVICES SECTION ------------------>
+    <section id="services" style="background: white; padding: 60px 20px; margin-top: 0;">
+        <h2 style="color: var(--primary-color); margin-bottom: 40px;">📋 Our Services</h2>
+        <div
+            style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; max-width: 1200px; margin: 0 auto;">
+            <div style="background: var(--secondary-color); padding: 30px; border-radius: 15px; width: 280px; box-shadow: var(--shadow); transition: transform 0.3s ease;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3em; margin-bottom: 15px;">🚨</div>
+                <h3 style="color: var(--primary-color);">Emergency Response</h3>
+                <p>24/7 rapid emergency ambulance dispatch with trained paramedics.</p>
+            </div>
+            <div style="background: var(--secondary-color); padding: 30px; border-radius: 15px; width: 280px; box-shadow: var(--shadow); transition: transform 0.3s ease;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3em; margin-bottom: 15px;">🏥</div>
+                <h3 style="color: var(--primary-color);">Hospital Transfer</h3>
+                <p>Safe and comfortable inter-hospital patient transfers.</p>
+            </div>
+            <div style="background: var(--secondary-color); padding: 30px; border-radius: 15px; width: 280px; box-shadow: var(--shadow); transition: transform 0.3s ease;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3em; margin-bottom: 15px;">👶</div>
+                <h3 style="color: var(--primary-color);">Maternity Care</h3>
+                <p>Specialized ambulances for pregnancy and neonatal emergencies.</p>
+            </div>
+            <div style="background: var(--secondary-color); padding: 30px; border-radius: 15px; width: 280px; box-shadow: var(--shadow); transition: transform 0.3s ease;"
+                onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3em; margin-bottom: 15px;">💊</div>
+                <h3 style="color: var(--primary-color);">Medical Equipment</h3>
+                <p>Fully equipped ambulances with advanced life support systems.</p>
+            </div>
+        </div>
+    </section>
+
+    <!------------------ CONTACT SECTION ------------------>
+    <section id="contact"
+        style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 60px 20px; margin-top: 0; color: white;">
+        <h2 style="color: white; margin-bottom: 40px;">📞 Contact Us</h2>
+        <div
+            style="display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; max-width: 1000px; margin: 0 auto;">
+            <div style="text-align: center;">
+                <div style="font-size: 2.5em; margin-bottom: 10px;">📱</div>
+                <h3>Emergency Hotline</h3>
+                <p style="font-size: 1.5em; font-weight: 700;">123-456-7890</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 2.5em; margin-bottom: 10px;">📧</div>
+                <h3>Email</h3>
+                <p style="font-size: 1.2em;">help@tracknheal.com</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 2.5em; margin-bottom: 10px;">📍</div>
+                <h3>Address</h3>
+                <p style="font-size: 1.2em;">123 Medical Lane, Health City</p>
+            </div>
+        </div>
+        <p style="margin-top: 40px; opacity: 0.9;">© 2024 TrackNHeal Ambulance Service. All rights reserved.</p>
+    </section>
+
+    <!---------------- LOGIN / SIGNUP MODAL ---------------->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+
+            <span class="close" onclick="closeModal()">&times;</span>
+
+            <!-- Tabs -->
+            <div style="display:flex;">
+                <button class="tab-button active" onclick="switchTab(event,'login')">Login</button>
+                <button class="tab-button" onclick="switchTab(event,'signup')">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login" class="form-content active">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+
+                <button class="submit-btn" onclick="handleLogin()">Login</button>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup" class="form-content">
+                <div class="input-group">
+                    <label>Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+
+                <button class="submit-btn" onclick="handleSignup()">Create Account</button>
+            </div>
+
+        </div>
     </div>
-</div>
 
-<!---------------- JS FUNCTIONS ---------------->
-<script>
-// ✅ Open modal
-function openModal() {
-    document.getElementById("loginModal").style.display = "block";
-}
+    <!---------------- BOOKING MODAL ---------------->
+    <div id="bookingModal" class="modal booking-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBookingModal()">&times;</span>
 
-// ✅ Close modal
-function closeModal() {
-    document.getElementById("loginModal").style.display = "none";
-}
+            <h2>🚑 Book Ambulance</h2>
 
-// ✅ Switch tabs
-function switchTab(event, tabName) {
-    document.querySelectorAll(".form-content").forEach(box => box.classList.remove("active"));
-    document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
-    document.getElementById(tabName).classList.add("active");
-    event.target.classList.add("active");
-}
+            <div id="bookingMessage" class="booking-message"></div>
 
-/* ✅ SIGNUP → POST → backend */
-function handleSignup() {
-    const user = {
-        name: document.getElementById("signupName").value,
-        email: document.getElementById("signupEmail").value,
-        password: document.getElementById("signupPassword").value
-    };
+            <div id="bookingForm">
+                <div class="input-group">
+                    <label>Patient Name *</label>
+                    <input type="text" id="patientName" placeholder="Enter patient name" required>
+                </div>
 
-    fetch("http://localhost:3000/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user)
-    })
-    .then(r => r.json())
-    .then(d => alert(d.message));
-}
+                <div class="input-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="patientPhone" placeholder="Enter phone number" required>
+                </div>
 
-/* ✅ LOGIN → POST → backend */
-function handleLogin() {
-    const user = {
-        email: document.getElementById("loginEmail").value,
-        password: document.getElementById("loginPassword").value
-    };
+                <div class="input-group">
+                    <label>Pickup Location *</label>
+                    <input type="text" id="pickupLocation" placeholder="Enter pickup address" required>
+                </div>
 
-    fetch("http://localhost:3000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user)
-    })
-    .then(r => r.json())
-    .then(d => alert(d.message));
-}
-</script>
+                <div class="input-group">
+                    <label>Drop Location (Hospital) *</label>
+                    <input type="text" id="dropLocation" placeholder="Enter hospital/destination" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Emergency Type *</label>
+                    <select id="emergencyType" required>
+                        <option value="">Select emergency type</option>
+                        <option value="Cardiac">Cardiac Emergency</option>
+                        <option value="Accident">Accident/Trauma</option>
+                        <option value="Pregnancy">Pregnancy/Maternity</option>
+                        <option value="Respiratory">Respiratory Emergency</option>
+                        <option value="General">General Emergency</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Additional Notes (Optional)</label>
+                    <textarea id="bookingNotes" placeholder="Any additional information..."></textarea>
+                </div>
+
+                <button class="submit-btn" id="bookingSubmitBtn" onclick="handleBooking()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!---------------- JS FUNCTIONS ---------------->
+    <script>
+        // ✅ User session state
+        let currentUser = null;
+
+        // ✅ Check login status on page load
+        window.onload = function () {
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateAuthUI();
+            }
+        }
+
+        // ✅ Update UI based on login status
+        function updateAuthUI() {
+            const authSection = document.getElementById('authSection');
+            if (currentUser) {
+                authSection.innerHTML = `
+                    <div class="user-info">
+                        <span class="user-name">👤 ${currentUser.name}</span>
+                        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                    </div>
+                `;
+            } else {
+                authSection.innerHTML = '<button class="login-btn" onclick="openModal()">Login</button>';
+            }
+        }
+
+        // ✅ Handle logout
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            updateAuthUI();
+            alert('Logged out successfully!');
+        }
+
+        // ✅ Toggle mobile menu
+        function toggleMobileMenu() {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.querySelector('.nav-links').classList.toggle('active');
+        }
+
+        // ✅ Close mobile menu
+        function closeMobileMenu() {
+            document.querySelector('.hamburger').classList.remove('active');
+            document.querySelector('.nav-links').classList.remove('active');
+        }
+
+        // ✅ Open modal
+        function openModal() {
+            document.getElementById("loginModal").style.display = "block";
+        }
+
+        // ✅ Close modal
+        function closeModal() {
+            document.getElementById("loginModal").style.display = "none";
+        }
+
+        // ✅ Switch tabs
+        function switchTab(event, tabName) {
+            document.querySelectorAll(".form-content").forEach(box => box.classList.remove("active"));
+            document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+            document.getElementById(tabName).classList.add("active");
+            event.target.classList.add("active");
+        }
+
+        /* ✅ SIGNUP → POST → backend */
+        function handleSignup() {
+            const name = document.getElementById("signupName").value;
+            const email = document.getElementById("signupEmail").value;
+            const password = document.getElementById("signupPassword").value;
+
+            if (!name || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            fetch("http://localhost:3000/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.message === "Signup successful") {
+                        // Auto-login after signup
+                        currentUser = { id: data.userId, name: name, email: email };
+                        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        updateAuthUI();
+                        closeModal();
+                    }
+                });
+        }
+
+        /* ✅ LOGIN → POST → backend */
+        function handleLogin() {
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        currentUser = { id: data.userId, name: data.userName, email: email };
+                        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        updateAuthUI();
+                        closeModal();
+                        alert('Login successful! You can now book an ambulance.');
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        // ✅ Open booking modal (requires login)
+        function openBookingModal() {
+            if (!currentUser) {
+                alert('⚠️ Please login or create an account first to book an ambulance.');
+                openModal();
+                return;
+            }
+            document.getElementById("bookingModal").style.display = "block";
+            resetBookingForm();
+        }
+
+        // ✅ Open booking modal with location from search bar
+        function openBookingWithLocation() {
+            if (!currentUser) {
+                alert('⚠️ Please login or create an account first to book an ambulance.');
+                openModal();
+                return;
+            }
+            const location = document.getElementById("quickPickupLocation").value;
+            openBookingModal();
+            if (location) {
+                document.getElementById("pickupLocation").value = location;
+            }
+        }
+
+        // ✅ Close booking modal
+        function closeBookingModal() {
+            document.getElementById("bookingModal").style.display = "none";
+            resetBookingForm();
+        }
+
+        // ✅ Reset booking form
+        function resetBookingForm() {
+            document.getElementById("patientName").value = "";
+            document.getElementById("patientPhone").value = "";
+            document.getElementById("pickupLocation").value = "";
+            document.getElementById("dropLocation").value = "";
+            document.getElementById("emergencyType").value = "";
+            document.getElementById("bookingNotes").value = "";
+            document.getElementById("bookingMessage").className = "booking-message";
+            document.getElementById("bookingMessage").innerHTML = "";
+            document.getElementById("bookingForm").style.display = "block";
+            document.getElementById("bookingSubmitBtn").disabled = false;
+            document.getElementById("bookingSubmitBtn").classList.remove("loading");
+        }
+
+        // ✅ Validate booking form
+        function validateBookingForm() {
+            const patientName = document.getElementById("patientName").value.trim();
+            const phone = document.getElementById("patientPhone").value.trim();
+            const pickup = document.getElementById("pickupLocation").value.trim();
+            const drop = document.getElementById("dropLocation").value.trim();
+            const emergency = document.getElementById("emergencyType").value;
+
+            if (!patientName || !phone || !pickup || !drop || !emergency) {
+                showBookingMessage("Please fill in all required fields.", "error");
+                return false;
+            }
+
+            // Basic phone validation
+            if (phone.length < 10) {
+                showBookingMessage("Please enter a valid phone number.", "error");
+                return false;
+            }
+
+            return true;
+        }
+
+        // ✅ Show booking message
+        function showBookingMessage(message, type) {
+            const msgEl = document.getElementById("bookingMessage");
+            msgEl.innerHTML = message;
+            msgEl.className = "booking-message " + type;
+        }
+
+        // ✅ Handle booking submission
+        function handleBooking() {
+            if (!validateBookingForm()) return;
+
+            const submitBtn = document.getElementById("bookingSubmitBtn");
+            submitBtn.disabled = true;
+            submitBtn.classList.add("loading");
+
+            const booking = {
+                userId: currentUser.id,
+                patientName: document.getElementById("patientName").value.trim(),
+                phone: document.getElementById("patientPhone").value.trim(),
+                pickupLocation: document.getElementById("pickupLocation").value.trim(),
+                dropLocation: document.getElementById("dropLocation").value.trim(),
+                emergencyType: document.getElementById("emergencyType").value,
+                notes: document.getElementById("bookingNotes").value.trim()
+            };
+
+            fetch("http://localhost:3000/book", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(booking)
+            })
+                .then(r => r.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove("loading");
+
+                    if (data.success) {
+                        document.getElementById("bookingForm").style.display = "none";
+                        showBookingMessage(
+                            `✅ ${data.message}<br><br>Your Booking ID: <span class="booking-id">#${data.bookingId}</span><br><br>An ambulance will be dispatched shortly!`,
+                            "success"
+                        );
+                    } else {
+                        showBookingMessage(data.message || "Booking failed. Please try again.", "error");
+                    }
+                })
+                .catch(err => {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove("loading");
+                    showBookingMessage("Network error. Please check your connection.", "error");
+                });
+        }
+
+        // ✅ Close modals when clicking outside
+        window.onclick = function (event) {
+            if (event.target.classList.contains("modal")) {
+                event.target.style.display = "none";
+                if (event.target.id === "bookingModal") {
+                    resetBookingForm();
+                }
+            }
+        }
+    </script>
 
 </body>
+
 </html>
