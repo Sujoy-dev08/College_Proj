@@ -145,12 +145,6 @@ db.query(sql, [name, email, hashedPassword], ...)
 ---
 
 ### Step 4: Updated Login API
-**Before (Insecure):**
-```javascript
-// Fetch user by email only
-const sql = "SELECT * FROM users WHERE email=?";
-
-// Then compare password using bcrypt
 const match = await bcrypt.compare(password, user.password);
 if (match) {
     // Login successful
