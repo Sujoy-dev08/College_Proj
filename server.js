@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import mysql from "mysql2";
 import cors from "cors";
@@ -20,10 +21,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // ✅ MySQL Connection
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "BABU@08ram",
-    database: "tracknheal_db"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 db.connect(err => {
@@ -140,6 +141,7 @@ app.post("/book", (req, res) => {
 });
 
 // ✅ Start server
-app.listen(3000, () => {
-    console.log("✅ Server running at http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`✅ Server running at http://localhost:${PORT}`);
 });
