@@ -495,6 +495,145 @@
             font-weight: 700;
             color: var(--primary-color);
         }
+
+        /* History Modal Styles */
+        .history-modal .modal-content {
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .history-modal h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .history-item {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.2s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .history-item-id {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .history-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .history-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .history-status.dispatched {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .history-status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .history-status.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .history-item-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .history-item-details span {
+            color: #666;
+        }
+
+        .history-item-details strong {
+            color: var(--text-color);
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .history-empty .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .my-bookings-btn {
+            background: transparent;
+            border: 2px solid #3498db;
+            color: #3498db;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .my-bookings-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .cancel-booking-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-booking-btn:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        .cancel-booking-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
     </style>
 </head>
 
@@ -715,6 +854,20 @@
         </div>
     </div>
 
+    <!--------------  BOOKING HISTORY MODAL ---------------->
+    <div id="historyModal" class="modal history-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHistoryModal()">&times;</span>
+            <h2>📋 My Booking History</h2>
+            <div id="historyContent" class="history-list">
+                <div class="history-empty">
+                    <div class="icon">⏳</div>
+                    <p>Loading your bookings...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!---------------- JS FUNCTIONS ---------------->
     <script>
         // ✅ User session state
@@ -735,6 +888,7 @@
             if (currentUser) {
                 authSection.innerHTML = `
                     <div class="user-info">
+                        <button class="my-bookings-btn" onclick="openHistoryModal()">📋 My Bookings</button>
                         <span class="user-name">👤 ${currentUser.name}</span>
                         <button class="logout-btn" onclick="handleLogout()">Logout</button>
                     </div>
@@ -961,6 +1115,138 @@
         // ✅ Close Login Required Modal
         function closeLoginRequiredModal() {
             document.getElementById("loginRequiredModal").style.display = "none";
+        }
+
+        // ✅ Open History Modal
+        function openHistoryModal() {
+            document.getElementById("historyModal").style.display = "block";
+            loadBookingHistory();
+        }
+
+        // ✅ Close History Modal
+        function closeHistoryModal() {
+            document.getElementById("historyModal").style.display = "none";
+        }
+
+        // ✅ Load Booking History
+        async function loadBookingHistory() {
+            const historyContent = document.getElementById("historyContent");
+
+            if (!currentUser) {
+                historyContent.innerHTML = `
+                    <div class="history-empty">
+                        <div class="icon">🔒</div>
+                        <p>Please login to view your bookings</p>
+                    </div>
+                `;
+                return;
+            }
+
+            historyContent.innerHTML = `
+                <div class="history-empty">
+                    <div class="icon">⏳</div>
+                    <p>Loading your bookings...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/user/bookings/${currentUser.id}`);
+                const data = await response.json();
+
+                if (data.success && data.bookings.length > 0) {
+                    historyContent.innerHTML = data.bookings.map(booking => `
+                        <div class="history-item" id="booking-${booking.id}">
+                            <div class="history-item-header">
+                                <span class="history-item-id">Booking #${booking.id}</span>
+                                <span class="history-status ${booking.status}">${booking.status}</span>
+                            </div>
+                            <div class="history-item-details">
+                                <div><span>Patient:</span> <strong>${escapeHtml(booking.patient_name)}</strong></div>
+                                <div><span>Phone:</span> <strong>${escapeHtml(booking.phone)}</strong></div>
+                                <div><span>Pickup:</span> <strong>${escapeHtml(booking.pickup_location)}</strong></div>
+                                <div><span>Destination:</span> <strong>${escapeHtml(booking.drop_location)}</strong></div>
+                                <div><span>Emergency:</span> <strong>${booking.emergency_type}</strong></div>
+                                <div><span>Date:</span> <strong>${formatDate(booking.created_at)}</strong></div>
+                            </div>
+                            ${(booking.status === 'pending' || booking.status === 'dispatched') ?
+                            `<button class="cancel-booking-btn" onclick="cancelBooking(${booking.id})">❌ Cancel Booking</button>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    historyContent.innerHTML = `
+                        <div class="history-empty">
+                            <div class="icon">📭</div>
+                            <p>No bookings yet. Book your first ambulance!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                historyContent.innerHTML = `
+                    <div class="history-empty">
+                        <div class="icon">⚠️</div>
+                        <p>Failed to load bookings. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ✅ Escape HTML for security
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ✅ Format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // ✅ Cancel Booking
+        async function cancelBooking(bookingId) {
+            if (!confirm('Are you sure you want to cancel this booking?')) {
+                return;
+            }
+
+            const btn = document.querySelector(`#booking-${bookingId} .cancel-booking-btn`);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Cancelling...';
+            }
+
+            try {
+                const response = await fetch(`/user/bookings/${bookingId}/cancel`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser.id })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Booking cancelled successfully!');
+                    loadBookingHistory(); // Refresh the list
+                } else {
+                    alert(data.message || 'Failed to cancel booking');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = '❌ Cancel Booking';
+                    }
+                }
+            } catch (error) {
+                alert('Network error. Please try again.');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '❌ Cancel Booking';
+                }
+            }
         }
 
         // ✅ Close modals when clicking outside

@@ -153,7 +153,7 @@ if (match) {
 
 ---
 
-## How Bcrypt Works
+##  Bcrypt Working process
 
 ```
 User Password: "mypassword123"
@@ -170,3 +170,12 @@ Stored in DB: "$2b$10$N9qo8uLOickgx2ZMRZoMye.IjqQBrkHx5..."
 https://github.com/rohanchakraborty197/Collage_Proj
 
 
+Make sure the server is running with:
+1. npm start(or node server.js)
+
+2. Access the admin page through the server URL: http://localhost:3000/admin.html
+
+Default Admin Credentials:
+
+Email	    : admin@tracknheal.com
+Password	: admin123

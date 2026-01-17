@@ -67,7 +67,6 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
         return res.json({ success: false, message: "Email and password are required" });
     }
@@ -111,7 +110,7 @@ app.post("/login", async (req, res) => {
 
 // ✅ BOOK AMBULANCE API
 app.post("/book", (req, res) => {
-    const { patientName, phone, pickupLocation, dropLocation, emergencyType, notes } = req.body;
+    const { userId, patientName, phone, pickupLocation, dropLocation, emergencyType, notes } = req.body;
 
     // Validate required fields
     if (!patientName || !phone || !pickupLocation || !dropLocation || !emergencyType) {
@@ -121,10 +120,10 @@ app.post("/book", (req, res) => {
         });
     }
 
-    const sql = `INSERT INTO bookings (patient_name, phone, pickup_location, drop_location, emergency_type, notes) 
-                 VALUES (?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO bookings (user_id, patient_name, phone, pickup_location, drop_location, emergency_type, notes, status) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`;
 
-    db.query(sql, [patientName, phone, pickupLocation, dropLocation, emergencyType, notes || ""], (err, result) => {
+    db.query(sql, [userId || null, patientName, phone, pickupLocation, dropLocation, emergencyType, notes || ""], (err, result) => {
         if (err) {
             console.error("Booking error:", err);
             return res.json({
@@ -137,6 +136,159 @@ app.post("/book", (req, res) => {
             message: "Booking confirmed!",
             bookingId: result.insertId
         });
+    });
+});
+
+// ✅ GET USER'S BOOKING HISTORY
+app.get("/user/bookings/:userId", (req, res) => {
+    const { userId } = req.params;
+
+    const sql = "SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC";
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error("Fetch user bookings error:", err);
+            return res.json({ success: false, message: "Failed to fetch bookings" });
+        }
+        res.json({ success: true, bookings: results });
+    });
+});
+
+// ✅ USER CANCEL BOOKING
+app.put("/user/bookings/:bookingId/cancel", (req, res) => {
+    const { bookingId } = req.params;
+    const { userId } = req.body;
+
+    // First check if booking belongs to user and is cancellable
+    const checkSql = "SELECT * FROM bookings WHERE id = ? AND user_id = ?";
+    db.query(checkSql, [bookingId, userId], (err, results) => {
+        if (err) {
+            console.error("Check booking error:", err);
+            return res.json({ success: false, message: "Failed to cancel booking" });
+        }
+
+        if (results.length === 0) {
+            return res.json({ success: false, message: "Booking not found" });
+        }
+
+        const booking = results[0];
+        if (booking.status === 'completed' || booking.status === 'cancelled') {
+            return res.json({ success: false, message: "Cannot cancel this booking" });
+        }
+
+        // Cancel the booking
+        const updateSql = "UPDATE bookings SET status = 'cancelled' WHERE id = ?";
+        db.query(updateSql, [bookingId], (err, result) => {
+            if (err) {
+                console.error("Cancel booking error:", err);
+                return res.json({ success: false, message: "Failed to cancel booking" });
+            }
+            res.json({ success: true, message: "Booking cancelled successfully" });
+        });
+    });
+});
+
+// ✅ ADMIN APIs:
+// ✅ ADMIN LOGIN API
+app.post("/admin/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.json({ success: false, message: "Email and password are required" });
+    }
+
+    const sql = "SELECT * FROM admins WHERE email=?";
+    db.query(sql, [email], async (err, results) => {
+        if (err) {
+            console.error("Admin login error:", err);
+            return res.json({ success: false, message: "Login failed" });
+        }
+
+        if (results.length > 0) {
+            const admin = results[0];
+
+            try {
+                const isHashed = admin.password.startsWith('$2b$') || admin.password.startsWith('$2a$');
+                let match = false;
+
+                if (isHashed) {
+                    match = await bcrypt.compare(password, admin.password);
+                } else {
+                    // Allow plain text for initial setup
+                    match = (password === admin.password);
+                }
+
+                if (match) {
+                    res.json({
+                        success: true,
+                        message: "Admin login successful",
+                        adminId: admin.id,
+                        adminName: admin.username
+                    });
+                } else {
+                    res.json({ success: false, message: "Invalid admin credentials" });
+                }
+            } catch (error) {
+                console.error("Admin compare error:", error);
+                res.json({ success: false, message: "Login failed" });
+            }
+        } else {
+            res.json({ success: false, message: "Invalid admin credentials" });
+        }
+    });
+});
+
+// ✅ GET ALL BOOKINGS (for admin dashboard)
+app.get("/admin/bookings", (req, res) => {
+    const sql = "SELECT * FROM bookings ORDER BY created_at DESC";
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Fetch bookings error:", err);
+            return res.json({ success: false, message: "Failed to fetch bookings" });
+        }
+        res.json({ success: true, bookings: results });
+    });
+});
+
+// ✅ UPDATE BOOKING STATUS
+app.put("/admin/bookings/:id/status", (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ['pending', 'dispatched', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+        return res.json({ success: false, message: "Invalid status" });
+    }
+
+    const sql = "UPDATE bookings SET status = ? WHERE id = ?";
+    db.query(sql, [status, id], (err, result) => {
+        if (err) {
+            console.error("Update status error:", err);
+            return res.json({ success: false, message: "Failed to update status" });
+        }
+        if (result.affectedRows === 0) {
+            return res.json({ success: false, message: "Booking not found" });
+        }
+        res.json({ success: true, message: "Status updated successfully" });
+    });
+});
+
+// ✅ GET BOOKING STATS (for dashboard cards)
+app.get("/admin/stats", (req, res) => {
+    const sql = `
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'dispatched' THEN 1 ELSE 0 END) as dispatched,
+            SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+            SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled
+        FROM bookings
+    `;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Stats error:", err);
+            return res.json({ success: false, message: "Failed to fetch stats" });
+        }
+        res.json({ success: true, stats: results[0] });
     });
 });
 
